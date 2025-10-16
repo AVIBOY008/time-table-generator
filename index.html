@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMART TIMETABLE CONFIGURATION</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00b4d8;
+      --secondary: #7b2ff7;
+      --accent: #ff8fab;
+      --bg-dark: #0a0a10;
+      --glass: rgba(255, 255, 255, 0.1);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at 30% 30%, #0b0b1b, #000000 80%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: relative;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    /* Background Blobs */
+    .blob {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--primary), transparent 70%);
+      border-radius: 50%;
+      opacity: 0.2;
+      animation: blobMove 12s infinite alternate ease-in-out;
+      z-index: 0;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+
+    .blob:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+    .blob:nth-child(2) { bottom: 10%; right: 10%; background: radial-gradient(circle, var(--secondary), transparent 70%); animation-delay: 2s; }
+    .blob:nth-child(3) { top: 50%; left: 60%; background: radial-gradient(circle, var(--accent), transparent 70%); animation-delay: 4s; }
+
+    @keyframes blobMove {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(60px, -80px) scale(1.2); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px; /* Increased width for horizontal timetable */
+      background: rgba(20, 20, 40, 0.8);
+      backdrop-filter: blur(15px);
+      border-radius: var(--radius);
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(123, 47, 247, 0.1);
+      position: relative;
+      z-index: 2;
+      animation: slideUp 1.4s ease-out;
+      margin-bottom: 60px;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, var(--secondary), var(--accent), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      margin-bottom: 25px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+      letter-spacing: 1px;
+    }
+
+    .form-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0, 180, 216, 0.25);
+    }
+
+    h2 {
+      color: var(--primary);
+      border-left: 5px solid var(--secondary);
+      padding-left: 12px;
+      margin-top: 0;
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #cfcfcf;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f2f2f2;
+      font-size: 1rem;
+      box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      background: rgba(0, 180, 216, 0.15);
+      box-shadow: 0 0 15px var(--primary);
+      transform: scale(1.02);
+    }
+
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    input[type="radio"] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .dynamic-form-section {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      animation: fadeSlide 0.6s ease-in-out;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .subject-entry {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: var(--radius);
+      padding: 15px;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 25px rgba(0, 180, 216, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.15);
+      transform: skewX(-45deg);
+      transition: left 0.6s ease;
+    }
+
+    button:hover::after { left: 200%; }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px var(--secondary);
+    }
+
+    #output-message {
+      margin-top: 25px;
+      padding: 20px;
+      background: rgba(0, 180, 216, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      text-align: center;
+      font-weight: 600;
+      color: #fff;
+      display: none;
+      animation: glowIn 1s ease-in-out;
+      box-shadow: 0 0 15px rgba(0,180,216,0.3);
+    }
+
+    @keyframes glowIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* New styles for results and download links */
+    .results-section {
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: none;
+    }
+
+    .timetable-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius);
+      overflow-x: auto; /* Horizontal scroll for many timeslots */
+    }
+
+    .timetable-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.05);
+      min-width: 800px; /* Minimum width for horizontal layout */
+    }
+
+    .timetable-table th, .timetable-table td {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .timetable-table th {
+      background: rgba(0, 180, 216, 0.2);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Day column styling */
+    .timetable-table th:first-child {
+      background: rgba(123, 47, 247, 0.2);
+    }
+
+    .timetable-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .download-section {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .download-btn {
+      background: linear-gradient(90deg, var(--accent), var(--secondary));
+      color: white;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4);
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Cell content styling for better readability */
+    .timetable-table td {
+      max-width: 150px;
+      word-wrap: break-word;
+    }
+
+    /* Break cells styling */
+    .break-cell {
+      background: rgba(255, 143, 171, 0.1) !important;
+      font-weight: 600;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob"></div>
+<div class="blob"></div>
+<div class="blob"></div>
+
+<div class="container">
+  <h1><span style="color:#e0e0e0;">Smart</span> Timetable Scheduler</h1>
+
+  <form id="timetable-form">
+    <div class="form-section">
+      <h2>Generation Settings</h2>
+      <div class="form-group">
+        <label for="num-timetables">How many timetables to generate?</label>
+        <input type="number" id="num-timetables" name="num-timetables" min="1" value="5">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Timeslots Configuration</h2>
+      <div class="form-group radio-group">
+        <label>Do you want to modify timeslots?</label>
+        <label><input type="radio" name="modify-timeslots" value="yes"> Yes</label>
+        <label><input type="radio" name="modify-timeslots" value="no" checked> No</label>
+      </div>
+      <div id="timeslots-container" class="dynamic-form-section" style="display: none;">
+        <div class="form-group">
+          <label for="num-timeslots">Number of timeslots per day:</label>
+          <input type="number" id="num-timeslots" min="1">
+        </div>
+        <div id="timeslots-list" class="form-group"></div>
+        <div class="form-group">
+          <label for="tea-break">Timeslot for the tea break:</label>
+          <input type="text" id="tea-break" placeholder="e.g., 10:45-11:15">
+        </div>
+        <div class="form-group">
+          <label for="lunch-break">Timeslot for the lunch break:</label>
+          <input type="text" id="lunch-break" placeholder="e.g., 1:05-2:00">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Subjects & Faculty Configuration</h2>
+      <div class="form-group radio-group">
+        <label>Do you want to modify subjects/faculty?</label>
+        <label><input type="radio" name="modify-subjects" value="yes"> Yes</label>
+        <label><input type="radio" name="modify-subjects" value="no" checked> No</label>
+      </div>
+      <div id="subjects-container" class="dynamic-form-section" style="display: none;">
+        <div class="form-group">
+          <label for="num-subjects">Number of subjects/labs:</label>
+          <input type="number" id="num-subjects" min="1">
+        </div>
+        <div id="subjects-list" class="form-group"></div>
+      </div>
+    </div>
+
+    <button type="submit" id="generate-btn">
+      <span id="btn-text">GENERATE TIMETABLES</span>
+      <span id="btn-loading" class="loading" style="display: none;"></span>
+    </button>
+  </form>
+
+  <div id="output-message"></div>
+
+  <!-- New Results Section -->
+  <div id="results-section" class="results-section">
+    <h2>Generated Timetables</h2>
+    <div id="timetables-container"></div>
+    <div class="download-section" id="download-links"></div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('timetable-form');
+    const modifyTimeslotsRadios = document.querySelectorAll('input[name="modify-timeslots"]');
+    const timeslotsContainer = document.getElementById('timeslots-container');
+    const numTimeslotsInput = document.getElementById('num-timeslots');
+    const timeslotsListContainer = document.getElementById('timeslots-list');
+    const modifySubjectsRadios = document.querySelectorAll('input[name="modify-subjects"]');
+    const subjectsContainer = document.getElementById('subjects-container');
+    const numSubjectsInput = document.getElementById('num-subjects');
+    const subjectsListContainer = document.getElementById('subjects-list');
+    const outputMessage = document.getElementById('output-message');
+    const resultsSection = document.getElementById('results-section');
+    const timetablesContainer = document.getElementById('timetables-container');
+    const downloadLinks = document.getElementById('download-links');
+    const generateBtn = document.getElementById('generate-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnLoading = document.getElementById('btn-loading');
+
+    const toggleSection = (container, radios) => {
+      radios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          container.style.display = e.target.value === 'yes' ? 'block' : 'none';
+        });
+      });
+    };
+
+    toggleSection(timeslotsContainer, modifyTimeslotsRadios);
+    toggleSection(subjectsContainer, modifySubjectsRadios);
+
+    const createInputs = (numInput, listContainer, type) => {
+      numInput.addEventListener('input', (e) => {
+        const num = parseInt(e.target.value);
+        listContainer.innerHTML = '';
+        if (num > 0) {
+          for (let i = 0; i < num; i++) {
+            if (type === 'timeslot') {
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.placeholder = `Timeslot ${i + 1}`;
+              input.name = `timeslot-${i}`;
+              listContainer.appendChild(input);
+            } else if (type === 'subject') {
+              const div = document.createElement('div');
+              div.className = 'subject-entry';
+              div.innerHTML = `
+                <input type="text" placeholder="Subject/Lab ${i + 1}" name="subject-${i}">
+                <input type="text" placeholder="Faculty for Subject/Lab ${i + 1}" name="faculty-${i}">
+              `;
+              listContainer.appendChild(div);
+            }
+          }
+        }
+      });
+    };
+
+    createInputs(numTimeslotsInput, timeslotsListContainer, 'timeslot');
+    createInputs(numSubjectsInput, subjectsListContainer, 'subject');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Show loading state
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline-block';
+      generateBtn.disabled = true;
+
+      // Prepare data for API
+      const requestData = {
+        num_timetables: parseInt(document.getElementById('num-timetables').value) || 5
+      };
+
+      // Add timeslots if modified
+      if (document.querySelector('input[name="modify-timeslots"]:checked').value === 'yes') {
+        const timeslots = [];
+        document.querySelectorAll('#timeslots-list input').forEach(input => {
+          if (input.value) timeslots.push(input.value);
+        });
+        if (timeslots.length > 0) {
+          requestData.timeslots = timeslots;
+          requestData.tea_break = document.getElementById('tea-break').value;
+          requestData.lunch_break = document.getElementById('lunch-break').value;
+        }
+      }
+
+      // Add subjects if modified
+      if (document.querySelector('input[name="modify-subjects"]:checked').value === 'yes') {
+        const subjects = {};
+        document.querySelectorAll('.subject-entry').forEach(entry => {
+          const subjectInput = entry.querySelector('input[name^="subject-"]');
+          const facultyInput = entry.querySelector('input[name^="faculty-"]');
+          if (subjectInput.value && facultyInput.value) {
+            subjects[subjectInput.value] = facultyInput.value;
+          }
+        });
+        if (Object.keys(subjects).length > 0) {
+          requestData.subjects = subjects;
+        }
+      }
+
+      console.log("Sending data to backend:", requestData);
+      
+      outputMessage.textContent = 'Generating timetables...';
+      outputMessage.style.display = 'block';
+      outputMessage.style.background = 'rgba(0, 180, 216, 0.15)';
+
+      try {
+        // Make API call to backend
+        const response = await fetch('/api/generate-timetables', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          outputMessage.textContent = `✅ Successfully generated ${data.timetables.length} timetables!`;
+          outputMessage.style.background = 'rgba(76, 175, 80, 0.15)';
+          
+          // Display timetables with horizontal layout
+          displayHorizontalTimetables(data.timetables, requestData.timeslots, requestData.tea_break, requestData.lunch_break);
+          
+          // Display download links
+          displayDownloadLinks(data.pdf_files, data.session_id);
+          
+          // Show results section
+          resultsSection.style.display = 'block';
+        } else {
+          outputMessage.textContent = `❌ Error: ${data.message}`;
+          outputMessage.style.background = 'rgba(244, 67, 54, 0.15)';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        outputMessage.textContent = '❌ Network error. Please try again.';
+        outputMessage.style.background = 'rgba(244, 67, 54, 0.15)';
+      } finally {
+        // Reset button state
+        btnText.style.display = 'inline-block';
+        btnLoading.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    });
+
+    function displayHorizontalTimetables(timetables, customTimeslots, teaBreak, lunchBreak) {
+      timetablesContainer.innerHTML = '';
+      
+      timetables.forEach((timetable, index) => {
+        const timetableDiv = document.createElement('div');
+        timetableDiv.className = 'timetable-container';
+        
+        const title = document.createElement('h3');
+        title.textContent = `Timetable Version ${index + 1}`;
+        title.style.color = 'var(--primary)';
+        timetableDiv.appendChild(title);
+
+        // Create table
+        const table = document.createElement('table');
+        table.className = 'timetable-table';
+        
+        // Use custom timeslots or default ones
+        const timeslots = customTimeslots || [
+          "8:00-8:55", "8:55-9:50", "9:50-10:45",
+          "10:45-11:15", "11:15-12:10", "12:10-1:05",
+          "1:05-2:00", "2:00-2:55", "2:55-3:50", "3:50-4:45", "4:45-5:40"
+        ];
+        
+        // Create header row with timeslots (horizontal)
+        const headerRow = document.createElement('tr');
+        
+        // First cell is empty for day column
+        const emptyHeader = document.createElement('th');
+        emptyHeader.textContent = 'Day / Time';
+        headerRow.appendChild(emptyHeader);
+        
+        // Add timeslots as headers
+        timeslots.forEach(timeslot => {
+          const th = document.createElement('th');
+          th.textContent = timeslot;
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+        
+        // Create data rows for each day (vertical)
+        const days = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+        days.forEach(day => {
+          const row = document.createElement('tr');
+          
+          // Day header cell
+          const dayHeader = document.createElement('td');
+          dayHeader.style.fontWeight = '600';
+          dayHeader.style.background = 'rgba(123, 47, 247, 0.1)';
+          dayHeader.textContent = day;
+          row.appendChild(dayHeader);
+          
+          // Add cells for each timeslot
+          timeslots.forEach((timeslot, slotIndex) => {
+            const cell = document.createElement('td');
+            
+            // Check if this cell content is available
+            if (timetable[day] && timetable[day][slotIndex]) {
+              const cellContent = timetable[day][slotIndex];
+              
+              // Apply special styling for breaks
+              if (cellContent.includes('BREAK')) {
+                cell.className = 'break-cell';
+              }
+              
+              cell.innerHTML = cellContent.replace(/\n/g, '<br>');
+            } else {
+              cell.textContent = '-';
+            }
+            row.appendChild(cell);
+          });
+          
+          table.appendChild(row);
+        });
+        
+        timetableDiv.appendChild(table);
+        timetablesContainer.appendChild(timetableDiv);
+      });
+    }
+
+    function displayDownloadLinks(pdfFiles, sessionId) {
+      downloadLinks.innerHTML = '<h3>Download PDFs:</h3>';
+      
+      pdfFiles.forEach((pdfFile, index) => {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `/api/download-pdf/${sessionId}/${pdfFile}`;
+        downloadLink.className = 'download-btn';
+        downloadLink.textContent = `Download Timetable ${index + 1}`;
+        downloadLink.download = pdfFile;
+        downloadLinks.appendChild(downloadLink);
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
+
+
+
